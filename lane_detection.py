@@ -8,6 +8,9 @@ class LaneDetection:
     def __init__(self):
         self.debug_img = None
 
+
+
+
     def detect(self, observation: np.ndarray) -> np.ndarray:
         # Konvertiere das Bild in den HSV-Farbraum
         hsv = cv2.cvtColor(observation, cv2.COLOR_BGR2HSV)
@@ -37,6 +40,46 @@ class LaneDetection:
         black_image[mitte_y - 12 // 2:mitte_y + 12 // 2,
         mitte_x - 8 // 2:mitte_x + 8 // 2] = 0
 
+        visited = np.zeros((96, 96), dtype=bool)
+        left_line_coordinates = []
+        right_line_coordinates = []
+
+        def dfs(y, x, side):
+            # Basisfall: Überprüfe die Grenzen und ob der Pixel bereits besucht wurde oder nicht weiß ist
+            if y < 0 or y >= 96 or x < 0 or x >= 96 or visited[y, x] or not np.array_equal(black_image[y, x], [255, 255, 255]):
+                return
+
+            # Markiere diesen Pixel als besucht
+            visited[y, x] = True
+            if side == 'left':
+                left_line_coordinates.append((y, x))
+            if side == 'right':
+                right_line_coordinates.append((y, x))
+
+            # Rekursive Suche in einem 5x5 Bereich um den Pixel herum
+            for dy in range(-2, 3):
+                for dx in range(-2, 3):
+                    dfs(y + dy, x + dx, side)
+
+        for i in range(47):
+
+            if np.array_equal(black_image[82, 47-i], [255, 255, 255]):
+                #black_image[82][47-i] = [0, 0, 255]
+                dfs(82, 47-i, 'left')
+                break
+        for i in range(47):
+            if np.array_equal(black_image[82, 48+i], [255, 255, 255]):
+                #black_image[82][47-i] = [0, 0, 255]
+                dfs(82, 48+i, 'right')
+                break
+
+        for i in range(len(left_line_coordinates)):
+            black_image[left_line_coordinates[i][0]][left_line_coordinates[i][1]] = [0, 255, 0]
+
+        for i in range(len(right_line_coordinates)):
+            black_image[right_line_coordinates[i][0]][right_line_coordinates[i][1]] = [255, 0, 0]
+
+        #print(black_image[48][14])
         # Speichere das bearbeitete Bild in debug_img zur Anzeige
         self.debug_img = black_image
 
