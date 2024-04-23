@@ -6,30 +6,35 @@ import cv2
 import gymnasium as gym
 import numpy as np
 
+import lane_detection
 from env_wrapper import CarRacingEnvWrapper
 from input_controller import InputController
 from path_planning import PathPlanning
+from lane_detection import LaneDetection
 
 
 def run(env, input_controller: InputController):
     path_planning = PathPlanning()
+    lane_detection = LaneDetection()
 
     seed = int(np.random.randint(0, int(1e6)))
     state_image, info = env.reset(seed=seed)
     total_reward = 0.0
-
+    print(info['speed'])
     while not input_controller.quit:
-        way_points, curvature = path_planning.plan(info['left_lane_boundary'], info['right_lane_boundary'])
+
+        [left_lane_boundary, right_lane_boundary] = lane_detection.detect(state_image)
+        way_points = path_planning.plan(left_lane_boundary, right_lane_boundary)
 
         cv_image = np.asarray(state_image, dtype=np.uint8)
         way_points = np.array(way_points, dtype=np.int32)
         for point in way_points:
             if 0 < point[0] < 96 and 0 < point[1] < 84:
                 cv_image[int(point[1]), int(point[0])] = [255, 255, 255]
-        for point in info['left_lane_boundary']:
+        for point in left_lane_boundary:
             if 0 < point[0] < 96 and 0 < point[1] < 84:
                 cv_image[int(point[1]), int(point[0])] = [255, 0, 0]
-        for point in info['right_lane_boundary']:
+        for point in right_lane_boundary:
             if 0 < point[0] < 96 and 0 < point[1] < 84:
                 cv_image[int(point[1]), int(point[0])] = [0, 0, 255]
 

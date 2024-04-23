@@ -59,9 +59,9 @@ class LaneDetection:
             # Markiere diesen Pixel als besucht
             visited[y, x] = True
             if side == 'left':
-                left_line_coordinates.append((y, x))
+                left_line_coordinates.append((x, y))
             if side == 'right':
-                right_line_coordinates.append((y, x))
+                right_line_coordinates.append((x, y))
 
             # Rekursive Suche in einem 5x5 Bereich um den Pixel herum
             for dy in range(-2, 3):
@@ -123,14 +123,14 @@ class LaneDetection:
 
 
         for i in range(len(left_line_coordinates)):
-            black_image[left_line_coordinates[i][0]][left_line_coordinates[i][1]] = [0, 255, 0]
+            black_image[left_line_coordinates[i][1]][left_line_coordinates[i][0]] = [0, 255, 0]
 
         for i in range(len(right_line_coordinates)):
-            black_image[right_line_coordinates[i][0]][right_line_coordinates[i][1]] = [255, 0, 0]
+            black_image[right_line_coordinates[i][1]][right_line_coordinates[i][0]] = [255, 0, 0]
 
 
         #print(black_image[48][14])
         # Speichere das bearbeitete Bild in debug_img zur Anzeige
         self.debug_img = black_image
 
-        return self.debug_img
+        return [left_line_coordinates, right_line_coordinates]
