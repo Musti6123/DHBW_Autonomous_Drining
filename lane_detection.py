@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import numpy as np
 import cv2
+from scipy.interpolate import interp1d
+import matplotlib.pyplot as plt
 
 class LaneDetection:
 
@@ -12,6 +14,11 @@ class LaneDetection:
 
 
     def detect(self, observation: np.ndarray) -> np.ndarray:
+
+
+
+
+
         # Konvertiere das Bild in den HSV-Farbraum
         hsv = cv2.cvtColor(observation, cv2.COLOR_BGR2HSV)
 
@@ -61,23 +68,66 @@ class LaneDetection:
                 for dx in range(-2, 3):
                     dfs(y + dy, x + dx, side)
 
-        for i in range(47):
+        left = 0
+        right = 0
 
-            if np.array_equal(black_image[82, 47-i], [255, 255, 255]):
-                #black_image[82][47-i] = [0, 0, 255]
-                dfs(82, 47-i, 'left')
-                break
         for i in range(47):
+            if np.array_equal(black_image[82, 47-i], [255, 255, 255]):
+                if left == 0:
+                    dfs(82, 47-i, 'left')
+                    left = 1
+            if np.array_equal(black_image[64, 57-i], [255, 255, 255]):
+                if left == 1:
+                    if len(left_line_coordinates) < 15:
+                        dfs(64, 57-i, 'left')
+                        left = 2
             if np.array_equal(black_image[82, 48+i], [255, 255, 255]):
-                #black_image[82][47-i] = [0, 0, 255]
-                dfs(82, 48+i, 'right')
+                if right == 0:
+                    dfs(82, 48+i, 'right')
+                    right = 1
+            if np.array_equal(black_image[64, 38+i], [255, 255, 255]):
+                if right == 1:
+                    if len(right_line_coordinates) < 15:
+                        dfs(64, 38+i, 'right')
+                        right = 2
+            if right == 2 & left == 2:
                 break
+
+        if len(left_line_coordinates) == 0:
+            left_line_coordinates = right_line_coordinates.copy()
+            right_line_coordinates = []
+            if len(left_line_coordinates) > 0:
+                for i in range(96-left_line_coordinates[0][1]):
+                    if np.array_equal(black_image[82, left_line_coordinates[0][1]+i], [255, 255, 255]):
+                        dfs(82, left_line_coordinates[0][1]+i, 'right')
+                if len(left_line_coordinates) == 0:
+                    for i in range(82):
+                        if np.array_equal(black_image[82-i, 0], [255, 255, 255]):
+                            dfs(82-i, 96, 'right')
+
+        if len(right_line_coordinates) == 0:
+            right_line_coordinates = left_line_coordinates.copy()
+            left_line_coordinates = []
+            if len(right_line_coordinates) > 0:
+                for i in range(right_line_coordinates[0][1]):
+                    if np.array_equal(black_image[82, right_line_coordinates[0][1]-i], [255, 255, 255]):
+                        dfs(82, right_line_coordinates[0][1]-i, 'left')
+                if len(left_line_coordinates) == 0:
+                    for i in range(82):
+                        if np.array_equal(black_image[82-i, 0], [255, 255, 255]):
+                            dfs(82-i, 0, 'left')
+
+
+
+
+
 
         for i in range(len(left_line_coordinates)):
             black_image[left_line_coordinates[i][0]][left_line_coordinates[i][1]] = [0, 255, 0]
 
         for i in range(len(right_line_coordinates)):
             black_image[right_line_coordinates[i][0]][right_line_coordinates[i][1]] = [255, 0, 0]
+
 
         #print(black_image[48][14])
         # Speichere das bearbeitete Bild in debug_img zur Anzeige
