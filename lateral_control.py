@@ -7,19 +7,26 @@ import numpy as np
 
 
 
+
+
 class LateralControl:
 
     def __init__(self):
         self._car_position = np.array([48, 64])
-    pass
+
 
     #definieren vom positiven und negativen Winkel, 90° = pi/2
+    # Begrenzung des Winkels
+
+
 
     #Vom auto aus den nähsten Punkt finden
     def find_nearest_point(self,trajectory):
-        distances = [np.linalg.norm(self._car_position-trajectory) for trajectory in trajectory]
-        nearest_index = np.argmin(distances)
-        return trajectory[nearest_index]
+        if len(trajectory) > 0:
+            distances = [np.linalg.norm(self._car_position-trajectory) for trajectory in trajectory]
+            nearest_index = np.argmin(distances)
+            return trajectory[nearest_index]
+        return self._car_position
 
 
     #Distanz zwischen Auto und nähesten Punkt
@@ -30,8 +37,12 @@ class LateralControl:
     #Bestimmen des Winkels des Pfades
 
     def calculate_path_angle(self,nearest_point):
-        angle = math.atan2(nearest_point[1]-self._car_position[1], nearest_point[0]-self._car_position[0])
+        angle = math.atan2(nearest_point[0]-self._car_position[0], nearest_point[1]-self._car_position[1])
         return math.degrees(angle)
+
+    #pd controll
+
+
 
     # Stanley Formel
 
@@ -44,7 +55,17 @@ class LateralControl:
         nearest_point = self.find_nearest_point(trajectory)
         crosstrack_error = self.distance_to_nearest_point(nearest_point)
         path_angle = self.calculate_path_angle(nearest_point)
-        delta = path_angle + math.atan(crosstrack_error / speed)
+
+        print (speed)
+
+        delta = path_angle + math.atan(crosstrack_error / 0.5 + speed)
+
+        if delta > math.pi/2:
+            delta = math.pi/2
+        elif delta < -math.pi/2:
+            delta = -math.pi/2
+
+
         return delta
 
 
