@@ -8,21 +8,29 @@ import numpy as np
 
 from env_wrapper import CarRacingEnvWrapper
 from input_controller import InputController
+from lane_detection import LaneDetection
 from lateral_control import LateralControl
+from path_planning import PathPlanning
 
 
 def run(env, input_controller: InputController):
     lateral_control = LateralControl()
+    lane_detection = LaneDetection()
+    path_planning = PathPlanning()
 
     seed = int(np.random.randint(0, int(1e6)))
     state_image, info = env.reset(seed=seed)
     total_reward = 0.0
 
     while not input_controller.quit:
-        steering_angle = lateral_control.control(info['trajectory'], info['speed'])
+
+
 
         cv_image = np.asarray(state_image, dtype=np.uint8)
-        for point in info['trajectory']:
+        left_lane_boundaries, right_lane_boundaries = lane_detection.detect(cv_image)
+        trajectory, curvature = path_planning.plan(left_lane_boundaries, right_lane_boundaries)
+        steering_angle = lateral_control.control(trajectory, info['speed'])
+        for point in trajectory:
             if 0 < point[0] < 96 and 0 < point[1] < 84:
                 cv_image[int(point[1]), int(point[0])] = [255, 255, 255]
 
