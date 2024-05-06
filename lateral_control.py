@@ -56,9 +56,9 @@ class LateralControl:
         crosstrack_error = self.distance_to_nearest_point(nearest_point)
         path_angle = self.calculate_path_angle(nearest_point)
 
-        print (speed)
+        print (path_angle)
 
-        delta = path_angle + math.atan(crosstrack_error / 0.5 + speed)
+        delta = path_angle + math.atan(0.5*crosstrack_error / (-0.00000000000000002 + speed))
 
         if delta > math.pi/2:
             delta = math.pi/2
