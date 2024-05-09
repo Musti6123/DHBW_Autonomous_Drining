@@ -12,7 +12,9 @@ import numpy as np
 class LateralControl:
 
     def __init__(self):
-        self._car_position = np.array([48, 64])
+        self._car_position = np.array([47, 64])
+
+        self.steering_angle = [0]  # Setze den Lenkwinkel auf 0 Grad zu Beginn
 
 
     #definieren vom positiven und negativen Winkel, 90° = pi/2
@@ -38,6 +40,7 @@ class LateralControl:
 
     def calculate_path_angle(self,nearest_point):
         angle = math.atan2(nearest_point[0]-self._car_position[0], nearest_point[1]-self._car_position[1])
+
         return math.degrees(angle)
 
     #pd controll
@@ -56,9 +59,9 @@ class LateralControl:
         crosstrack_error = self.distance_to_nearest_point(nearest_point)
         path_angle = self.calculate_path_angle(nearest_point)
 
-        print (path_angle)
+        #print (self._car_position)
 
-        delta = path_angle + math.atan(0.5*crosstrack_error / (-0.00000000000000002 + speed))
+        delta = path_angle + math.atan(0.8 *crosstrack_error / (-0.0000000002 + speed))
 
         if delta > math.pi/2:
             delta = math.pi/2
