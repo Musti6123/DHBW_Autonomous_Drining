@@ -38,6 +38,10 @@ class LaneDetection:
         # Zeichne die weißen Ränder auf das schwarze Bild
         black_image[edges == 255] = (255, 255, 255)
 
+
+
+
+
         # Füge am unteren Rand des Bildes einen schwarzen Balken hinzu
         balken_hoehe = 13  # Höhe des Balkens in Pixeln
         black_image[-balken_hoehe:] = 0  # Setze die unteren 'balken_hoehe' Pixel auf Schwarz
@@ -46,6 +50,23 @@ class LaneDetection:
         mitte_x, mitte_y = (47,71)
         black_image[mitte_y - 12 // 2:mitte_y + 12 // 2,
         mitte_x - 8 // 2:mitte_x + 8 // 2] = 0
+
+        def connectPoints(coordinate1: tuple, coordinate2: tuple):
+            cv2.line(black_image, coordinate1, coordinate2, (255, 255, 255), 1)
+
+
+        for i in range(10):
+            if np.array_equal(black_image[64, 42+i], [255, 255, 255]):
+                for j in range(14):
+                    if np.array_equal(black_image[64+j, 42], [255, 255, 255]):
+                        connectPoints((42+i, 62), (42, 64+j))
+                        break
+                    if np.array_equal(black_image[64+j, 51], [255, 255, 255]):
+                        connectPoints((42+i, 64), (51, 64+j))
+                        break
+                for j in range(10):
+                    if np.array_equal(black_image[78, 42+j], [255, 255, 255]):
+                        connectPoints((42+i, 64), (42+j, 78))
 
         visited = np.zeros((96, 96), dtype=bool)
         left_line_coordinates = []
@@ -112,7 +133,7 @@ class LaneDetection:
                 for i in range(right_line_coordinates[0][1]):
                     if np.array_equal(black_image[82, right_line_coordinates[0][1]-i], [255, 255, 255]):
                         dfs(82, right_line_coordinates[0][1]-i, 'left')
-                if len(left_line_coordinates) == 0:
+                if len(right_line_coordinates) == 0:
                     for i in range(82):
                         if np.array_equal(black_image[82-i, 0], [255, 255, 255]):
                             dfs(82-i, 0, 'left')
@@ -129,8 +150,9 @@ class LaneDetection:
             black_image[right_line_coordinates[i][1]][right_line_coordinates[i][0]] = [255, 0, 0]
 
 
-        #print(black_image[48][14])
-        # Speichere das bearbeitete Bild in debug_img zur Anzeige
+
+
+
         self.debug_img = black_image
 
         return [left_line_coordinates, right_line_coordinates]
