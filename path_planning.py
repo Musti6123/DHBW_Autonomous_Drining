@@ -34,5 +34,4 @@ class PathPlanning:
                     last_right_index = offset
                     break
 
-        path.append((48,48))
         return np.array(path), np.array([])
