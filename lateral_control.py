@@ -68,6 +68,8 @@ class LateralControl:
         elif delta < -math.pi/2:
             delta = -math.pi/2
 
+            print(speed)
+
 
         return delta
 
