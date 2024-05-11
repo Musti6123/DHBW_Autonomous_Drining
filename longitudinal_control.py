@@ -23,7 +23,9 @@ class LongitudinalControl:
 
 
 
-    def control(self, speed, target_speed):
+    def control(self, speed, target_speed, steering_angle):
+      #  self.max = max
+      #  self.min = min
         error = target_speed - speed
 
         proportional = self.kp * error
@@ -33,24 +35,24 @@ class LongitudinalControl:
 
         control_output = proportional + integral + derivative
 
-        if control_output > self.max:
-            control_output = self.max
-        elif control_output < self.min:
-            control_output = self.min
+       # if control_output > self.max:
+        #    control_output = self.max
+       # elif control_output < self.min:
+         #   control_output = self.min
 
         self.prev_error = error
 
-       # if isinstance(control_output, np.ndarray):
-         #   acceleration = np.where(control_output >= 0, control_output, 0.0)
-          #  braking = np.where(control_output < 0, -control_output, 0.0)
-       # else:
-         #   acceleration = control_output if control_output >= 0 else 0.0
-         #   braking = -control_output if control_output < 0 else 0.0
+        if isinstance(control_output, np.ndarray):
+            acceleration = np.where(control_output >= 0, control_output, 0.0)
+            braking = np.where(control_output < 0, -control_output, 0.0)
+        else:
+            acceleration = control_output if control_output >= 0 else 0.0
+            braking = -control_output if control_output < 0 else 0.0
 
-      #  return acceleration, braking
-        return control_output
+        return acceleration, braking
+      # return control_output
 
-    def predict_target_speed(self, speed, trajectory,input_controller):
+    def predict_target_speed(self, speed, trajectory, steering_angle):
         curvature = np.mean(np.abs(np.gradient(trajectory)))
         reduction_factor = 1.0 - np.clip(curvature * 10, 0.0, 0.9)
         target_speed = speed * reduction_factor
