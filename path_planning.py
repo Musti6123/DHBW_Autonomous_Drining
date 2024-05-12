@@ -22,7 +22,7 @@ class PathPlanning:
             return (point1[0] + x_mid, point1[1] + y_mid)
 
         if len(left_lane_boundary) == 0 or len(right_lane_boundary) == 0:
-            return [], []
+            return [], 0
 
         path = []
         last_right_index = 0
@@ -37,6 +37,4 @@ class PathPlanning:
         if len(path) > 22:
             for i in range(14):
                 curvature += abs(path[i+7][0] - path[i+8][0])
-        if(curvature == []):
-            print('aaa')
         return path, curvature

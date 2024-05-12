@@ -134,7 +134,6 @@ class LaneDetection:
             else:
                 break
 
-        print(left, right)
 
 
 
