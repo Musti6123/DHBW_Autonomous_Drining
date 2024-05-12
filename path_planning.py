@@ -24,7 +24,7 @@ class PathPlanning:
             # Calculates the Euclidean distance modified by a factor on the y-coordinate difference between two points.
             return math.sqrt((point1[0] - point2[0]) ** 2 + ((point1[1] - point2[1]) * 0.6) ** 2)
 
-
+        # Function to calculate midpoint between two points
         def midpoint(point1: tuple, point2: tuple) -> tuple:
             # Calculates the midpoint between two given points.
             return ((point1[0] + point2[0]) / 2, (point1[1] + point2[1]) / 2)
