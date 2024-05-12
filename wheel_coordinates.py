@@ -1,3 +1,5 @@
+## Was intended to get the wheels as coordinates, but was not used
+
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
