@@ -38,7 +38,7 @@ class LongitudinalControl:
     def predict_target_speed(self, curvature, steering_angle):
         # Adjust the speed based on curvature and steering angle
         curvature_effect = max(self.max_speed - curvature * 2, 20)  # Stronger effect from curvature
-        steering_effect = max(self.max_speed - abs(math.degrees(steering_angle)) * 0.5, 20)  # Reduce the influence of steering angle
+        steering_effect = max(self.max_speed - abs(math.degrees(steering_angle)) * 0.7, 20)  # Reduce the influence of steering angle
 
         # Use the lower of two effects to ensure safety
         return max(curvature_effect, self.min_speed)

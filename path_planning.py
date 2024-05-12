@@ -13,13 +13,8 @@ class PathPlanning:
 
 
         def midpoint(point1: tuple, point2: tuple) -> tuple:
-            x_dif = int(point2[0] - point1[0])
-            y_dif = int(point2[1] - point1[1])
-            x_mid = int(x_dif / 2)
-            y_mid = int(y_dif / 2)
+            return ((point1[0] + point2[0]) / 2, (point1[1] + point2[1]) / 2)
 
-
-            return (point1[0] + x_mid, point1[1] + y_mid)
 
         if len(left_lane_boundary) == 0 or len(right_lane_boundary) == 0:
             return [], 0
@@ -33,8 +28,13 @@ class PathPlanning:
                     path.append(midpoint(left_point, right_point))
                     last_right_index = offset
                     break
+
         curvature = 0
         if len(path) > 22:
             for i in range(14):
                 curvature += abs(path[i+7][0] - path[i+8][0])
+        elif len(path) > 8:
+            for i in range(len(path) - 8):
+                curvature += abs(path[i+7][0] - path[i+8][0])
+
         return path, curvature
