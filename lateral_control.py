@@ -3,7 +3,7 @@ import math
 import numpy as np
 
 class LateralControl:
-    def __init__(self, k=4):
+    def __init__(self, k=2.7):
         """
         Konstruktor zur Initialisierung der Lateralsteuerung mit Stanley-Methode
         k - Verstärkungsfaktor für die Korrektur des Lenkwinkels

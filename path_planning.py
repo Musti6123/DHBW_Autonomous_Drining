@@ -46,8 +46,8 @@ class PathPlanning:
 
         curvature = 0
         # Calculate the curvature of the path based on changes in the x-coordinates of the path points.
-        if len(path) > 22:
-            for i in range(14):
+        if len(path) > 26:
+            for i in range(18):
                 curvature += abs(path[i+7][0] - path[i+8][0])
         elif len(path) > 8:
             for i in range(len(path) - 8):
