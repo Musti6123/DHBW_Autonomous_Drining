@@ -10,14 +10,16 @@ class LaneDetection:
     def __init__(self):
         self.debug_img = None
 
-
-
-
     def detect(self, observation: np.ndarray) -> np.ndarray:
+        """
+        Process an image to detect lane lines and return the coordinates of these lines.
 
+        Input:
+        observation: np.ndarray - the input image in BGR color format
 
-
-
+        Output:
+        list - contains two lists with the coordinates of the left and right lane lines
+        """
 
         # Convert the image to the HSV color space
         hsv = cv2.cvtColor(observation, cv2.COLOR_BGR2HSV)
@@ -86,6 +88,18 @@ class LaneDetection:
         right_line_coordinates = []
 
         def dfs(y, x, side):
+            """
+            Depth-first search to find and mark all connected components of the lane line.
+
+            Inputs:
+            y: int - the y-coordinate of the starting point
+            x: int - the x-coordinate of the starting point
+            side: str - 'left' or 'right' indicating which lane line is being tracked
+
+            Outputs:
+            None - directly modifies the image and coordinates list
+            """
+
             # Base case: Check the borders and whether the pixel has already been visited or is not white
             if y < 0 or y >= 96 or x < 0 or x >= 96 or visited[y, x] or not np.array_equal(black_image[y, x], [255, 255, 255]):
                 return
@@ -133,16 +147,6 @@ class LaneDetection:
                         break
             else:
                 break
-
-
-
-
-
-
-
-
-
-
 
         self.debug_img = black_image
 

@@ -3,7 +3,12 @@ import math
 import numpy as np
 
 class LateralControl:
-    def __init__(self, k=2):
+    def __init__(self, k=4):
+        """
+        Konstruktor zur Initialisierung der Lateralsteuerung mit Stanley-Methode
+        k - Verstärkungsfaktor für die Korrektur des Lenkwinkels
+        """
+
         self._car_position = np.array([47, 68])
         self.steering_angle = 0.0  # Initialize steering angle to 0 degrees
         self.k = k  # Gain parameter for the control law
@@ -11,6 +16,13 @@ class LateralControl:
         self.points_after = 5
 
     def find_nearest_point(self, trajectory):
+        """
+        Bestimme den nächsten Punkt auf der Trajektorie zum Auto
+        Inputs:
+          trajectory - Liste von (x, y) Tupeln, die Wegpunkte darstellen
+        Outputs:
+          Tuple aus Abstand zum nächsten Punkt, Koordinaten des nächsten Punktes und Index des nächsten Punktes
+        """
         if len(trajectory) == 0:
             return float('inf'), self._car_position, 0
 
@@ -23,6 +35,15 @@ class LateralControl:
         return distances[nearest_index], trajectory_np[nearest_index], nearest_index
 
     def calculate_path_angle(self, nearest_point, points_after):
+        """
+        Berechne den Pfadwinkel bezogen auf die Horizontale
+        Inputs:
+          nearest_point - die Koordinaten des nächsten Punktes auf der Trajektorie
+          points_after - die Koordinaten des nachfolgenden Punktes
+        Outputs:
+          angle - der Pfadwinkel in Radian
+        """
+
         dx = points_after[0] - nearest_point[0]
 
         dy = nearest_point[1] - points_after[1]
@@ -32,6 +53,15 @@ class LateralControl:
         return angle  # Convert radians to degrees
 
     def control(self, trajectory, speed):
+        """
+        Kontrolliere den Lenkwinkel basierend auf der Trajektorie und der Geschwindigkeit des Fahrzeugs
+        Inputs:
+          trajectory - Liste von (x, y) Tupeln, die Wegpunkte darstellen
+          speed - Geschwindigkeit des Fahrzeugs
+        Outputs:
+          steering_angle - der berechnete Lenkwinkel zur Anwendung
+        """
+
         self.call_count += 1  # Increment the call counter each time the control is called
         if speed <= 0 or self.call_count <= 20:
             return 0  # No steering if the car is not moving or during the first 20 calls
