@@ -24,9 +24,10 @@ def run(env, input_controller: InputController):
     while not input_controller.quit:
 
         [left_lane_boundary, right_lane_boundary] = lane_detection.detect(state_image)
-        way_points = path_planning.plan(left_lane_boundary, right_lane_boundary)
+        way_points, curvature = path_planning.plan(left_lane_boundary, right_lane_boundary)
 
         cv_image = np.asarray(state_image, dtype=np.uint8)
+
         way_points = np.array(way_points, dtype=np.int32)
         for point in way_points:
             if 0 < point[0] < 96 and 0 < point[1] < 84:

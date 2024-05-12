@@ -138,7 +138,15 @@ class LaneDetection:
                         if np.array_equal(black_image[82-i, 0], [255, 255, 255]):
                             dfs(82-i, 0, 'left')
 
+        if len(right_line_coordinates) == 0:
+            for i in range(94):
+                if np.array_equal(black_image[35, 94-i], [255, 255, 255]):
+                    dfs(35, i, 'right')
 
+        if len(left_line_coordinates) == 0:
+            for i in range(94):
+                    if np.array_equal(black_image[35, i], [255, 255, 255]):
+                        dfs(35, i, 'left')
 
 
 
@@ -148,8 +156,6 @@ class LaneDetection:
 
         for i in range(len(right_line_coordinates)):
             black_image[right_line_coordinates[i][1]][right_line_coordinates[i][0]] = [255, 0, 0]
-
-
 
 
 

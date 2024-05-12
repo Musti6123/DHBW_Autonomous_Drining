@@ -41,7 +41,7 @@ def run(env, input_controller: InputController):
         speed_history.append(info['speed'])
         target_speed_history.append(target_speed)
 
-        cv_image = np.asarray(lane_detection.debug_image, dtype=np.uint8)
+        cv_image = np.asarray(lane_detection.debug_img, dtype=np.uint8)
         for point in trajectory:
             if 0 < point[0] < 96 and 0 < point[1] < 84:
                 cv_image[int(point[1]), int(point[0])] = [255, 255, 255]

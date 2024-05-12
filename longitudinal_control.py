@@ -10,51 +10,34 @@ class LongitudinalControl:
     integral = 0.0
     prev_error = 0.0
 
-    max = 0.0
-    min = 0.0
-    dt = 0.0
-    def __init__(self, kp=1.0, ki=0.0, kd=0.0, dt= 0.0):
-        self.dt = dt
+    def __init__(self, kp=1.0, ki=0.0, kd=0.0, dt=0.1, max_speed=70, min_speed=5):
         self.kp = kp
         self.ki = ki
         self.kd = kd
-        self.max = max
-        self.min = min
-
-
+        self.dt = dt
+        self.max_speed = max_speed
+        self.min_speed = min_speed
 
     def control(self, speed, target_speed, steering_angle):
-      #  self.max = max
-      #  self.min = min
         error = target_speed - speed
-
         proportional = self.kp * error
         self.integral += error * self.dt
         integral = self.ki * self.integral
         derivative = self.kd * (error - self.prev_error) / self.dt
-
         control_output = proportional + integral + derivative
+        adjusted_speed = max(min(control_output + speed, self.max_speed), self.min_speed)
 
-       # if control_output > self.max:
-        #    control_output = self.max
-       # elif control_output < self.min:
-         #   control_output = self.min
+        accelerate = 1 if control_output > 0 else 0
+        brake = 1 if control_output < 0 else 0
 
         self.prev_error = error
 
-        if isinstance(control_output, np.ndarray):
-            acceleration = np.where(control_output >= 0, control_output, 0.0)
-            braking = np.where(control_output < 0, -control_output, 0.0)
-        else:
-            acceleration = control_output if control_output >= 0 else 0.0
-            braking = -control_output if control_output < 0 else 0.0
+        return accelerate, brake
 
-        return acceleration, braking
-      # return control_output
-
-    def predict_target_speed(self, speed, trajectory, steering_angle):
-        curvature = np.mean(np.abs(np.gradient(trajectory)))
-        reduction_factor = 1.0 - np.clip(curvature * 10, 0.0, 0.9)
-        target_speed = speed * reduction_factor
-
-        return target_speed
+    def predict_target_speed(self, curvature):
+        if isinstance(curvature, int):
+            if curvature < 15:
+                return max(self.max_speed - curvature * 2, 20)  # Mindestens 20 bei leichter Krümmung
+            else:
+                return max(self.min_speed, 70 - curvature * 1.5)  # Stark abbremsen bei hoher Krümmung
+        return 15

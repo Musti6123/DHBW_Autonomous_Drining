@@ -8,7 +8,9 @@ from matplotlib import pyplot as plt
 
 from env_wrapper import CarRacingEnvWrapper
 from input_controller import InputController
+from lane_detection import LaneDetection
 from longitudinal_control import LongitudinalControl
+from path_planning import PathPlanning
 
 fig = plt.figure()
 plt.ion()
@@ -17,6 +19,8 @@ plt.show()
 
 def run(env, input_controller: InputController):
     longitudinal_control = LongitudinalControl()
+    path_planning = PathPlanning()
+    lane_detection = LaneDetection()
 
     seed = int(np.random.randint(0, int(1e6)))
     state_image, info = env.reset(seed=seed)
@@ -26,9 +30,11 @@ def run(env, input_controller: InputController):
     target_speed_history = []
 
     while not input_controller.quit:
-        target_speed = longitudinal_control.predict_target_speed(info['trajectory'], info['speed'], input_controller.steer)
+        cv_image = np.asarray(state_image, dtype=np.uint8)
+        left_lane_boundaries, right_lane_boundaries = lane_detection.detect(cv_image)
+        trajectory, curvature = path_planning.plan(left_lane_boundaries, right_lane_boundaries)
+        target_speed = longitudinal_control.predict_target_speed(curvature)
         acceleration, braking = longitudinal_control.control(info['speed'], target_speed, input_controller.steer)
-
         speed_history.append(info['speed'])
         target_speed_history.append(target_speed)
 

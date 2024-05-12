@@ -6,7 +6,7 @@ class PathPlanning:
     def __init__(self):
         pass
 
-    def plan(self, left_lane_boundary: np.ndarray, right_lane_boundary: np.ndarray) -> (np.ndarray, np.ndarray):
+    def plan(self, left_lane_boundary: np.ndarray, right_lane_boundary: np.ndarray):
 
         def distance(point1: tuple, point2: tuple) -> float:
             return math.sqrt((point1[0] - point2[0]) ** 2 + ((point1[1] - point2[1]) * 0.6) ** 2)
@@ -22,16 +22,21 @@ class PathPlanning:
             return (point1[0] + x_mid, point1[1] + y_mid)
 
         if len(left_lane_boundary) == 0 or len(right_lane_boundary) == 0:
-            return np.array([]), np.array([])
+            return [], []
 
         path = []
         last_right_index = 0
 
         for i, left_point in enumerate(left_lane_boundary):
             for offset, right_point in enumerate(right_lane_boundary[last_right_index:], start=last_right_index):
-                if 19.5 < distance(left_point, right_point) < 21:
+                if 19.5 < distance(left_point, right_point) < 24:
                     path.append(midpoint(left_point, right_point))
                     last_right_index = offset
                     break
-
-        return np.array(path), np.array([])
+        curvature = 0
+        if len(path) > 22:
+            for i in range(14):
+                curvature += abs(path[i+7][0] - path[i+8][0])
+        if(curvature == []):
+            print('aaa')
+        return path, curvature
