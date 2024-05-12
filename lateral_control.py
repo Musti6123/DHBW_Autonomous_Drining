@@ -7,6 +7,7 @@ class LateralControl:
         self._car_position = np.array([47, 68])
         self.steering_angle = 0.0  # Initialize steering angle to 0 degrees
         self.k = k  # Gain parameter for the control law
+        self.call_count = 0  # Initialize the count of method calls
 
     def find_nearest_point(self, trajectory):
         if len(trajectory) == 0:
@@ -24,12 +25,12 @@ class LateralControl:
             return 0  # Avoid division by zero
 
         angle = math.atan2(dy, dx)  # atan2 is safe for dy=0 or dx=0
-        print(math.degrees(angle))
         return math.degrees(angle)  # Convert radians to degrees
 
     def control(self, trajectory, speed):
-        if speed <= 0:
-            return 0  # No steering needed if the car is not moving
+        self.call_count += 1  # Increment the call counter each time the control is called
+        if speed <= 0 or self.call_count <= 20:
+            return 0  # No steering if the car is not moving or during the first 20 calls
 
         distance, nearest_point = self.find_nearest_point(trajectory)
         path_angle = self.calculate_path_angle(nearest_point)
