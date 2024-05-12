@@ -20,7 +20,10 @@ Fahrspurerkennung, Pfadplanung, Querregelung und Längsregelung.
 3. Testen: Durchführung von Tests der einzelnen Module, um die Funktionalität sicherzustellen
 4. Zusammenführung der Module: Alle Module werden in der main.py zusammen ausgeführt, um das Auto autonom fahren zu lassen
 5. Testen und Verbessern: Wenn das Auto noch nicht, wie gewünscht fährt, sollten noch Anpassungen gemacht werden.
-6. Dokumentation: Erstellung einer umfassenden Dokumentation des Codes, einschließlich Readme-Datei und Inline-Kommentaren, die Ansätze, Gleichungen und Verbesserungen erläutert.
+6. Dokumentation: Erstellung einer umfassenden Dokumentation des Codes, einschließlich Readme-Datei und Inline-Kommentaren,
+ die Ansätze, Gleichungen und Verbesserungen erläutert.
+
+
 
 
 
