@@ -27,9 +27,9 @@ class LongitudinalControl:
         control_output = proportional + integral + derivative
         adjusted_speed = max(min(control_output + speed, self.max_speed), self.min_speed)
 
-        # Setze 'accelerate' und 'brake' abhängig von der Größe des Fehlers
+        # Set 'accelerate' and 'brake' depending on the size of the error
         if abs(error) <= 2:
-            accelerate = 0  # Lasse das Fahrzeug rollen, weil es nah genug an der Zielgeschwindigkeit ist
+            accelerate = 0  # Let the vehicle roll because it is close enough to the target speed
             brake = 0
         else:
             accelerate = 1 if control_output > 0 else 0
@@ -43,7 +43,7 @@ class LongitudinalControl:
     def predict_target_speed(self, curvature):
         if isinstance(curvature, int):
             if curvature < 5:
-                return max(self.max_speed - curvature * 2, 20)  # Mindestens 20 bei leichter Krümmung
+                return max(self.max_speed - curvature * 2, 20)  # Minimum 20 with slight curvature
             else:
-                return 15  # Stark abbremsen bei hoher Krümmung
+                return 15  # Braking sharply with high curvature
         return 15

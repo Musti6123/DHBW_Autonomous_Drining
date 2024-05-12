@@ -19,34 +19,30 @@ class LaneDetection:
 
 
 
-        # Konvertiere das Bild in den HSV-Farbraum
+        # Convert the image to the HSV color space
         hsv = cv2.cvtColor(observation, cv2.COLOR_BGR2HSV)
 
-        # Definiere Schwellenwerte für Grautöne
+        # Define threshold values for gray tones
         lower_gray = np.array([0, 0, 0])
-        upper_gray = np.array([180, 255, 110])  # Helligkeit bis 100 für Grautöne
+        upper_gray = np.array([180, 255, 110])  # Brightness up to 100 for gray tones
 
-        # Erstelle eine Maske, die nur Grau- und Schwarztöne zulässt
+        # Create a mask that only allows gray and black tones
         mask_gray = cv2.inRange(hsv, lower_gray, upper_gray)
 
-        # Erkenne die Ränder im gefilterten Bild
+        # Recognize the edges in the filtered image
         edges = cv2.Canny(mask_gray, 50, 150)
 
-        # Erstelle ein schwarzes Bild der gleichen Größe wie das Originalbild
+        # Create a black image of the same size as the original image
         black_image = np.zeros_like(observation)
 
-        # Zeichne die weißen Ränder auf das schwarze Bild
+        # Draw the white borders on the black image
         black_image[edges == 255] = (255, 255, 255)
 
+        # Add a black bar at the bottom of the image
+        balken_hoehe = 13  # Height of the bar in pixels
+        black_image[-balken_hoehe:] = 0  # Set the lower 'balken_hoehe' pixels to black
 
-
-
-
-        # Füge am unteren Rand des Bildes einen schwarzen Balken hinzu
-        balken_hoehe = 13  # Höhe des Balkens in Pixeln
-        black_image[-balken_hoehe:] = 0  # Setze die unteren 'balken_hoehe' Pixel auf Schwarz
-
-        # Blende einen Kasten in der Mitte des Bildes aus
+        # Hide a box in the center of the image
         mitte_x, mitte_y = (47,71)
         black_image[mitte_y - 12 // 2:mitte_y + 12 // 2,
         mitte_x - 8 // 2:mitte_x + 8 // 2] = 0
@@ -73,18 +69,18 @@ class LaneDetection:
         right_line_coordinates = []
 
         def dfs(y, x, side):
-            # Basisfall: Überprüfe die Grenzen und ob der Pixel bereits besucht wurde oder nicht weiß ist
+            # Base case: Check the borders and whether the pixel has already been visited or is not white
             if y < 0 or y >= 96 or x < 0 or x >= 96 or visited[y, x] or not np.array_equal(black_image[y, x], [255, 255, 255]):
                 return
 
-            # Markiere diesen Pixel als besucht
+            # Mark this pixel as visited
             visited[y, x] = True
             if side == 'left':
                 left_line_coordinates.append((x, y))
             if side == 'right':
                 right_line_coordinates.append((x, y))
 
-            # Rekursive Suche in einem 5x5 Bereich um den Pixel herum
+            # Recursive search in a 5x5 area around the pixel
             for dy in range(-2, 3):
                 for dx in range(-2, 3):
                     dfs(y + dy, x + dx, side)
