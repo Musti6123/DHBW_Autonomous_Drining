@@ -51,15 +51,18 @@ class LaneDetection:
         black_image[mitte_y - 12 // 2:mitte_y + 12 // 2,
         mitte_x - 8 // 2:mitte_x + 8 // 2] = 0
 
+        connected = 0
+
         def connectPoints(coordinate1: tuple, coordinate2: tuple):
             cv2.line(black_image, coordinate1, coordinate2, (255, 255, 255), 1)
+            connected = 1
 
 
         for i in range(10):
             if np.array_equal(black_image[64, 42+i], [255, 255, 255]):
                 for j in range(14):
                     if np.array_equal(black_image[64+j, 42], [255, 255, 255]):
-                        connectPoints((42+i, 62), (42, 64+j))
+                        connectPoints((42+i, 64), (42, 64+j))
                         break
                     if np.array_equal(black_image[64+j, 51], [255, 255, 255]):
                         connectPoints((42+i, 64), (51, 64+j))
@@ -67,6 +70,20 @@ class LaneDetection:
                 for j in range(10):
                     if np.array_equal(black_image[78, 42+j], [255, 255, 255]):
                         connectPoints((42+i, 64), (42+j, 78))
+        if connected == 0:
+            for j in range(14):  # Seitenhöhen der Box
+                if np.array_equal(black_image[64+j, 42], [255, 255, 255]):
+                    for i in range(10):
+                        if np.array_equal(black_image[78, 42+i], [255, 255, 255]):
+                            connectPoints((42, 64+j), (42+i, 78))
+                    if connected == 0:
+                        for i in range(14):
+                            if np.array_equal(black_image[64+i, 51], [255, 255, 255]):
+                                connectPoints((42, 64+j), (51, 64+i))
+                if np.array_equal(black_image[64+j, 51], [255, 255, 255]):
+                    for i in range(10):
+                        if np.array_equal(black_image[78, 42+i], [255, 255, 255]):
+                            connectPoints((51, 64+j), (42+i, 78))
 
         visited = np.zeros((96, 96), dtype=bool)
         left_line_coordinates = []
@@ -81,8 +98,10 @@ class LaneDetection:
             visited[y, x] = True
             if side == 'left':
                 left_line_coordinates.append((x, y))
+                black_image[y, x] = [255,0,0]
             if side == 'right':
                 right_line_coordinates.append((x, y))
+                black_image[y, x] = [0,255,0]
 
             # Rekursive Suche in einem 5x5 Bereich um den Pixel herum
             for dy in range(-2, 3):
@@ -92,70 +111,41 @@ class LaneDetection:
         left = 0
         right = 0
 
-        for i in range(47):
-            if np.array_equal(black_image[82, 47-i], [255, 255, 255]):
-                if left == 0:
-                    dfs(82, 47-i, 'left')
-                    left = 1
-            if np.array_equal(black_image[64, 57-i], [255, 255, 255]):
-                if left == 1:
-                    if len(left_line_coordinates) < 15:
-                        dfs(64, 57-i, 'left')
-                        left = 2
-            if np.array_equal(black_image[82, 48+i], [255, 255, 255]):
-                if right == 0:
-                    dfs(82, 48+i, 'right')
-                    right = 1
-            if np.array_equal(black_image[64, 38+i], [255, 255, 255]):
-                if right == 1:
-                    if len(right_line_coordinates) < 15:
-                        dfs(64, 38+i, 'right')
-                        right = 2
-            if right == 2 & left == 2:
+        for i in range(90):
+            if left == 0 or right == 0:
+                for j in range(49):
+                    if left == 0 or right == 0:
+                        if np.array_equal(black_image[90-i, 47+j], [255, 255, 255]):
+                            if right == 0:
+                                dfs(90-i, 47+j, 'right')
+                                right = 1
+                            elif left == 0:
+                                dfs(90-i, 47+j, 'left')
+                                left = 1
+                        if np.array_equal(black_image[90-i, 47-j], [255, 255, 255]):
+                            if left == 0:
+                                dfs(90-i, 47-j, 'left')
+                                left = 1
+                            elif right == 0:
+                                dfs(90-i, 47-j, 'right')
+                                right = 1
+                        if len(left_line_coordinates) < 15:
+                            left = 0
+                        if len(right_line_coordinates) < 15:
+                            right = 0
+                    else:
+                        break
+            else:
                 break
 
-        if len(left_line_coordinates) == 0:
-            left_line_coordinates = right_line_coordinates.copy()
-            right_line_coordinates = []
-            if len(left_line_coordinates) > 0:
-                for i in range(96-left_line_coordinates[0][1]):
-                    if np.array_equal(black_image[82, left_line_coordinates[0][1]+i], [255, 255, 255]):
-                        dfs(82, left_line_coordinates[0][1]+i, 'right')
-                if len(left_line_coordinates) == 0:
-                    for i in range(82):
-                        if np.array_equal(black_image[82-i, 0], [255, 255, 255]):
-                            dfs(82-i, 96, 'right')
-
-        if len(right_line_coordinates) == 0:
-            right_line_coordinates = left_line_coordinates.copy()
-            left_line_coordinates = []
-            if len(right_line_coordinates) > 0:
-                for i in range(right_line_coordinates[0][1]):
-                    if np.array_equal(black_image[82, right_line_coordinates[0][1]-i], [255, 255, 255]):
-                        dfs(82, right_line_coordinates[0][1]-i, 'left')
-                if len(right_line_coordinates) == 0:
-                    for i in range(82):
-                        if np.array_equal(black_image[82-i, 0], [255, 255, 255]):
-                            dfs(82-i, 0, 'left')
-
-        if len(right_line_coordinates) == 0:
-            for i in range(94):
-                if np.array_equal(black_image[35, 94-i], [255, 255, 255]):
-                    dfs(35, i, 'right')
-
-        if len(left_line_coordinates) == 0:
-            for i in range(94):
-                    if np.array_equal(black_image[35, i], [255, 255, 255]):
-                        dfs(35, i, 'left')
+        print(left, right)
 
 
 
 
-        for i in range(len(left_line_coordinates)):
-            black_image[left_line_coordinates[i][1]][left_line_coordinates[i][0]] = [0, 255, 0]
 
-        for i in range(len(right_line_coordinates)):
-            black_image[right_line_coordinates[i][1]][right_line_coordinates[i][0]] = [255, 0, 0]
+
+
 
 
 
