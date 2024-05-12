@@ -1,5 +1,7 @@
 # Dokumentation zu dem Projekt 
 
+Ein Projekt von Mustafa Sahin (Matrikelnummer: 3002883) und Leonie Ottenbacher (Matrikelnummer: 8069980).
+
 
 ## 0. Projektbeschreibung
 Dieses Projekt soll ein Auto autonom fahren lassen und ist in folgende 
