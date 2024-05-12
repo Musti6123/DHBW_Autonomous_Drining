@@ -74,7 +74,7 @@ Dies geschieht mittels eines Proportional-Integral-Differential-Reglers (PID-Reg
 Nachdem die Parameter K<sub>p</sub>, K<sub>i</sub> und K<sub>d</sub> entsprechend eingestellt sind, 
 ermöglicht die Klasse LongitudinalControl eine effektive und sichere Längsregelung des Fahrzeugs.
 
-Mithilfe der Methode control wird die Geschwindigkeit des Fahrzeugs entsprechend des Reglerausgangs angepasst,  
+Mithilfe der Methode control wird die Geschwindigkeit des Fahrzeugs entsprechend des Reglerausgangs angepasst, 
 wobei sowohl Beschleunigung als auch Bremsen je nach Abweichung von der Zielgeschwindigkeit gesteuert werden. 
 Zusätzlich prognostiziert die Methode predict_target_speed die Zielgeschwindigkeit anhand der Straßenkrümmung und des Lenkwinkels. 
 Zusammen gewährleisten diese Funktionen eine präzise und zuverlässige Geschwindigkeitsregelung während der Fahrt.
